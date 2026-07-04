@@ -32,8 +32,9 @@ function doPost(e) {
     const data = JSON.parse(e.postData.contents);
     const action = data.action || 'submit';
 
-    if (action === 'delete') return handleDelete(data);
-    if (action === 'clear')  return handleClear(data);
+    if (action === 'delete')      return handleDelete(data);
+    if (action === 'clear')       return handleClear(data);
+    if (action === 'grade')       return handleGrade(data);
     return handleSubmit(data); // Default: student submission
   } catch (err) {
     return jsonResponse({ ok: false, error: String(err) });
@@ -115,6 +116,28 @@ function handleDelete(data) {
   }
   const sheet = getOrCreateSheet();
   sheet.deleteRow(rowId);
+  return jsonResponse({ ok: true });
+}
+
+function handleGrade(data) {
+  if (data.token !== TEACHER_TOKEN) {
+    return jsonResponse({ ok: false, error: 'Unauthorized' });
+  }
+  const rowId = parseInt(data.rowId, 10);
+  if (!rowId || rowId < 2) {
+    return jsonResponse({ ok: false, error: 'Invalid rowId' });
+  }
+  const sheet = getOrCreateSheet();
+  const cell = sheet.getRange(rowId, 11); // Payload column
+  let payload;
+  try {
+    payload = JSON.parse(cell.getValue());
+  } catch (e) {
+    return jsonResponse({ ok: false, error: 'Corrupt payload' });
+  }
+  payload.grades = data.grades || {};
+  payload.gradedAt = new Date().toISOString();
+  cell.setValue(JSON.stringify(payload));
   return jsonResponse({ ok: true });
 }
 

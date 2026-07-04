@@ -323,14 +323,63 @@
     });
   }
 
+  /* Auto-suggest grade based on answer key comparison */
+  function autoSuggestGrade(studentAnswer, question) {
+    if (!question || question.answer === undefined) return null; // manual only
+    if (studentAnswer === null || studentAnswer === undefined) return 'incorrect';
+    if (typeof question.answer === 'object') {
+      // matching
+      if (typeof studentAnswer !== 'object' || !studentAnswer) return 'incorrect';
+      const keys = Object.keys(question.answer);
+      let matches = 0;
+      keys.forEach((k) => {
+        if (studentAnswer[k] === question.answer[k]) matches++;
+      });
+      if (matches === keys.length) return 'correct';
+      if (matches === 0) return 'incorrect';
+      return 'partial';
+    }
+    // string comparison
+    if (String(studentAnswer).trim() === String(question.answer).trim()) return 'correct';
+    return 'incorrect';
+  }
+
+  function getGradeFor(student, qid) {
+    if (!student.grades) return null;
+    return student.grades[qid] || null;
+  }
+
+  function pointsFor(question, grade) {
+    if (grade === 'correct') return question.points;
+    if (grade === 'partial') return Math.ceil(question.points / 2);
+    return 0;
+  }
+
+  function computeGradeSummary(student, questions) {
+    let earned = 0;
+    let max = 0;
+    let graded = 0;
+    questions.forEach((q, i) => {
+      max += q.points;
+      const grade = getGradeFor(student, q.id);
+      if (grade) {
+        graded++;
+        earned += pointsFor(q, grade);
+      }
+    });
+    const pct = max ? Math.round((earned / max) * 100) : 0;
+    return { earned, max, graded, total: questions.length, pct };
+  }
+
   function renderStudentDetail() {
     const s = state.students.find((x) => x._rowId === state.selectedRowId);
     if (!s) return;
 
     $('#detail-empty').classList.add('hidden');
     const box = $('#detail-content');
-    const startedAt = s.meta.startedAt ? new Date(s.meta.startedAt) : null;
     const submittedAt = new Date(s.meta.submittedAt);
+    const questions = QUIZ_DATA.getAllQuestions();
+    const summary = computeGradeSummary(s, questions);
 
     box.innerHTML = `
       <div class="detail-head">
@@ -344,6 +393,7 @@
           </div>
         </div>
         <div class="detail-head__actions">
+          <button class="btn btn--ghost btn--sm" data-action="auto-grade">تصحيح تلقائي</button>
           <button class="btn btn--ghost btn--sm" data-action="download-student">
             <svg viewBox="0 0 24 24" width="14" height="14"><path d="M12 3v12m0 0l-4-4m4 4l4-4M4 17v2a2 2 0 002 2h12a2 2 0 002-2v-2" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>
             تحميل
@@ -354,30 +404,42 @@
         </div>
       </div>
 
-      <div class="detail-summary">
-        <div class="detail-summary__card">
-          <span class="detail-summary__label">ANSWERED</span>
-          <div class="detail-summary__value">
-            <span class="mono">${s.score.answered}</span>
-            <span style="color:var(--text-muted);font-size:14px"> / ${s.score.total}</span>
+      <div class="grade-summary" id="grade-summary">
+        <div class="grade-summary__main">
+          <div class="grade-summary__label mono">FINAL GRADE</div>
+          <div class="grade-summary__pct">
+            <span class="mono" id="grade-pct">${summary.pct}%</span>
+          </div>
+          <div class="grade-summary__points mono">
+            <span id="grade-earned">${summary.earned}</span> / <span id="grade-max">${summary.max}</span> نقطة
           </div>
         </div>
-        <div class="detail-summary__card">
-          <span class="detail-summary__label">DURATION</span>
-          <div class="detail-summary__value">
-            <span class="mono">${formatMinutes(s.meta.durationSeconds)}</span>
+        <div class="grade-summary__side">
+          <div class="detail-summary__card">
+            <span class="detail-summary__label">ANSWERED</span>
+            <div class="detail-summary__value">
+              <span class="mono">${s.score.answered}</span>
+              <span style="color:var(--text-muted);font-size:14px"> / ${s.score.total}</span>
+            </div>
           </div>
-        </div>
-        <div class="detail-summary__card">
-          <span class="detail-summary__label">COMPLETION</span>
-          <div class="detail-summary__value">
-            <span class="mono">${Math.round((s.score.answered / s.score.total) * 100)}%</span>
+          <div class="detail-summary__card">
+            <span class="detail-summary__label">GRADED</span>
+            <div class="detail-summary__value">
+              <span class="mono" id="grade-count">${summary.graded}</span>
+              <span style="color:var(--text-muted);font-size:14px"> / ${summary.total}</span>
+            </div>
+          </div>
+          <div class="detail-summary__card">
+            <span class="detail-summary__label">DURATION</span>
+            <div class="detail-summary__value">
+              <span class="mono">${formatMinutes(s.meta.durationSeconds)}</span>
+            </div>
           </div>
         </div>
       </div>
 
       <div class="answer-list">
-        ${s.answers.map((a, i) => renderAnswerItem(a, i, s)).join('')}
+        ${s.answers.map((a, i) => renderAnswerItem(a, i, s, questions[i])).join('')}
       </div>
     `;
 
@@ -387,9 +449,21 @@
     box.querySelector('[data-action="delete-student"]').addEventListener('click', () => {
       confirmDeleteStudent(s);
     });
+    box.querySelector('[data-action="auto-grade"]').addEventListener('click', () => {
+      autoGradeStudent(s, questions);
+    });
+
+    // Wire grade buttons
+    box.querySelectorAll('.grade-btn').forEach((btn) => {
+      btn.addEventListener('click', () => {
+        const qid = btn.dataset.qid;
+        const grade = btn.dataset.grade;
+        setStudentGrade(s, qid, grade);
+      });
+    });
   }
 
-  function renderAnswerItem(a, i, student) {
+  function renderAnswerItem(a, i, student, question) {
     const isEmpty = a.answer === null || a.answer === undefined ||
       (typeof a.answer === 'string' && a.answer.trim() === '') ||
       (typeof a.answer === 'object' && Object.keys(a.answer).length === 0);
@@ -405,16 +479,117 @@
       answerText = String(a.answer);
     }
 
+    const grade = getGradeFor(student, a.id);
+    const earned = grade ? pointsFor(question || { points: a.points }, grade) : 0;
+    const hasKey = question && question.answer !== undefined;
+    const suggested = hasKey ? autoSuggestGrade(a.answer, question) : null;
+
+    // Correct answer hint for teacher
+    let correctHint = '';
+    if (hasKey) {
+      let correctStr = '';
+      if (typeof question.answer === 'object') {
+        correctStr = Object.entries(question.answer).map(([k, v]) => {
+          const choice = (question.choices || []).find((c) => c.value === v);
+          const item = (question.items || []).find((it) => it.id === k);
+          return `${item ? item.label : k} → ${choice ? choice.label : v}`;
+        }).join(' · ');
+      } else {
+        if (question.options) {
+          const opt = question.options.find((o) => o.key === question.answer);
+          correctStr = opt ? `${question.answer}) ${opt.text}` : question.answer;
+        } else {
+          correctStr = question.answer;
+        }
+      }
+      correctHint = `<div class="answer-item__key"><strong>الإجابة الصحيحة:</strong> ${escapeHtml(correctStr)}</div>`;
+    }
+
     return `
-      <div class="answer-item ${isEmpty ? 'answer-item--empty' : ''}">
+      <div class="answer-item ${isEmpty ? 'answer-item--empty' : ''} ${grade ? 'answer-item--graded answer-item--' + grade : ''}">
         <div class="answer-item__head">
           <span class="answer-item__num">Q ${String(i + 1).padStart(2, '0')} / ${a.points} PTS</span>
           <span class="answer-item__section">${escapeHtml(a.section)}</span>
+          ${grade ? `<span class="answer-item__earned mono">+${earned}</span>` : ''}
         </div>
         <div class="answer-item__question">${escapeHtml(a.question)}</div>
         <div class="answer-item__answer ${isEmpty ? 'answer-item__answer--empty' : ''}">${escapeHtml(answerText)}</div>
+        ${correctHint}
+        <div class="grade-controls">
+          <span class="grade-controls__label mono">GRADE</span>
+          <div class="grade-btns">
+            <button class="grade-btn grade-btn--correct ${grade === 'correct' ? 'is-active' : ''} ${suggested === 'correct' && !grade ? 'is-suggested' : ''}" data-qid="${a.id}" data-grade="correct">
+              ✓ صحيح
+            </button>
+            <button class="grade-btn grade-btn--partial ${grade === 'partial' ? 'is-active' : ''} ${suggested === 'partial' && !grade ? 'is-suggested' : ''}" data-qid="${a.id}" data-grade="partial">
+              ~ جزئي
+            </button>
+            <button class="grade-btn grade-btn--incorrect ${grade === 'incorrect' ? 'is-active' : ''} ${suggested === 'incorrect' && !grade ? 'is-suggested' : ''}" data-qid="${a.id}" data-grade="incorrect">
+              ✗ خطأ
+            </button>
+            ${grade ? `<button class="grade-btn grade-btn--clear" data-qid="${a.id}" data-grade="">مسح</button>` : ''}
+          </div>
+        </div>
       </div>
     `;
+  }
+
+  /* ========================================================
+     GRADING ACTIONS
+  ======================================================== */
+  function setStudentGrade(student, qid, grade) {
+    if (!student.grades) student.grades = {};
+    if (grade === '') delete student.grades[qid];
+    else student.grades[qid] = grade;
+
+    // Optimistic UI update
+    renderStudentDetail();
+    renderStudentsList();
+    renderStats();
+
+    // Persist to backend
+    persistGrades(student);
+  }
+
+  function autoGradeStudent(student, questions) {
+    if (!student.grades) student.grades = {};
+    let changed = 0;
+    questions.forEach((q, i) => {
+      if (q.answer === undefined) return; // skip manual-only questions
+      const ans = student.answers[i] && student.answers[i].answer;
+      const suggestion = autoSuggestGrade(ans, q);
+      if (suggestion && student.grades[q.id] !== suggestion) {
+        student.grades[q.id] = suggestion;
+        changed++;
+      }
+    });
+    renderStudentDetail();
+    renderStudentsList();
+    renderStats();
+    persistGrades(student);
+    toast(`تم تصحيح ${changed} سؤالاً تلقائياً`);
+  }
+
+  let persistTimer = null;
+  function persistGrades(student) {
+    clearTimeout(persistTimer);
+    persistTimer = setTimeout(() => {
+      fetch(getBackendUrl(), {
+        method: 'POST',
+        headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+        body: JSON.stringify({
+          action: 'grade',
+          token: state.token,
+          rowId: student._rowId,
+          grades: student.grades || {}
+        })
+      })
+        .then((r) => r.json())
+        .then((data) => {
+          if (!data || !data.ok) toast('تعذّر حفظ الدرجات', 'error');
+        })
+        .catch(() => toast('تعذّر الاتصال', 'error'));
+    }, 400);
   }
 
   /* ========================================================
@@ -606,6 +781,198 @@
     );
     $('#tab-student').classList.toggle('hidden', name !== 'student');
     $('#tab-analytics').classList.toggle('hidden', name !== 'analytics');
+    $('#tab-charts').classList.toggle('hidden', name !== 'charts');
+    if (name === 'charts') renderClassCharts();
+  }
+
+  /* ========================================================
+     CLASS CHARTS
+  ======================================================== */
+  function renderClassCharts() {
+    const box = $('#charts-content');
+    if (!state.students.length) {
+      box.innerHTML = `
+        <div class="detail-empty">
+          <div class="detail-empty__icon">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+              <circle cx="12" cy="12" r="9"/>
+              <path d="M12 3v9l6 5"/>
+            </svg>
+          </div>
+          <h3>لا توجد بيانات بعد</h3>
+        </div>`;
+      return;
+    }
+
+    const questions = QUIZ_DATA.getAllQuestions();
+    const summaries = state.students.map((s) => computeGradeSummary(s, questions));
+
+    // 1. Grade distribution
+    const buckets = [
+      { label: 'F (< 50%)',  min: 0,  max: 49,  count: 0, color: 'var(--red)' },
+      { label: 'D (50-64%)', min: 50, max: 64,  count: 0, color: '#e97316' },
+      { label: 'C (65-74%)', min: 65, max: 74,  count: 0, color: 'var(--amber)' },
+      { label: 'B (75-89%)', min: 75, max: 89,  count: 0, color: 'var(--cyan)' },
+      { label: 'A (≥ 90%)',  min: 90, max: 100, count: 0, color: 'var(--mint)' }
+    ];
+    summaries.forEach((sm) => {
+      const b = buckets.find((x) => sm.pct >= x.min && sm.pct <= x.max);
+      if (b) b.count++;
+    });
+
+    // 2. Section performance (avg %)
+    const sections = QUIZ_DATA.sections.map((sec) => {
+      let earned = 0, max = 0;
+      state.students.forEach((s) => {
+        sec.questions.forEach((q) => {
+          max += q.points;
+          const grade = getGradeFor(s, q.id);
+          earned += pointsFor(q, grade);
+        });
+      });
+      const pct = max ? (earned / max) * 100 : 0;
+      return { title: sec.title, code: sec.code, pct: Math.round(pct) };
+    });
+
+    // 3. Question difficulty (% correct per question)
+    const qStats = questions.map((q) => {
+      const gradedCount = state.students.filter((s) => getGradeFor(s, q.id)).length;
+      const correctCount = state.students.filter((s) => getGradeFor(s, q.id) === 'correct').length;
+      const partialCount = state.students.filter((s) => getGradeFor(s, q.id) === 'partial').length;
+      const pct = gradedCount ? Math.round(((correctCount + partialCount * 0.5) / gradedCount) * 100) : 0;
+      return { id: q.id, pct, graded: gradedCount, correct: correctCount };
+    });
+
+    // 4. Duration distribution
+    const durMin = state.students.map((s) => Math.floor(s.meta.durationSeconds / 60));
+    const avgDur = durMin.reduce((a, b) => a + b, 0) / durMin.length;
+    const maxDur = Math.max(...durMin);
+    const minDur = Math.min(...durMin);
+
+    // Overall class average
+    const classAvg = Math.round(
+      summaries.reduce((sum, x) => sum + x.pct, 0) / summaries.length
+    );
+
+    // Averages by category
+    const gradedTotal = summaries.reduce((sum, x) => sum + x.graded, 0);
+    const gradedPossible = state.students.length * questions.length;
+
+    box.innerHTML = `
+      <!-- Big number: class average -->
+      <div class="chart-hero">
+        <div class="chart-hero__side">
+          <div class="chart-hero__label mono">CLASS AVERAGE</div>
+          <div class="chart-hero__value mono">${classAvg}<span class="chart-hero__pct">%</span></div>
+          <div class="chart-hero__desc">${state.students.length} طالب · ${gradedTotal}/${gradedPossible} سؤال مصحّح</div>
+        </div>
+        <div class="chart-hero__meta">
+          <div class="chart-meta-row">
+            <span>أعلى درجة</span>
+            <strong class="mono">${Math.max(...summaries.map(s => s.pct))}%</strong>
+          </div>
+          <div class="chart-meta-row">
+            <span>أقل درجة</span>
+            <strong class="mono">${Math.min(...summaries.map(s => s.pct))}%</strong>
+          </div>
+          <div class="chart-meta-row">
+            <span>متوسط الوقت</span>
+            <strong class="mono">${Math.round(avgDur)}د</strong>
+          </div>
+          <div class="chart-meta-row">
+            <span>أسرع/أبطأ</span>
+            <strong class="mono">${minDur}د / ${maxDur}د</strong>
+          </div>
+        </div>
+      </div>
+
+      <!-- Grade distribution -->
+      <section class="chart-card">
+        <div class="chart-card__head">
+          <span class="chart-card__num mono">01</span>
+          <h3>توزيع الدرجات</h3>
+        </div>
+        ${renderBarChart(buckets, state.students.length)}
+      </section>
+
+      <!-- Section performance -->
+      <section class="chart-card">
+        <div class="chart-card__head">
+          <span class="chart-card__num mono">02</span>
+          <h3>الأداء حسب القسم</h3>
+        </div>
+        ${renderSectionChart(sections)}
+      </section>
+
+      <!-- Question difficulty -->
+      <section class="chart-card">
+        <div class="chart-card__head">
+          <span class="chart-card__num mono">03</span>
+          <h3>صعوبة الأسئلة — نسبة الإجابات الصحيحة لكل سؤال</h3>
+        </div>
+        ${renderQuestionDifficulty(qStats)}
+      </section>
+    `;
+  }
+
+  function renderBarChart(buckets, totalStudents) {
+    const maxCount = Math.max(...buckets.map((b) => b.count), 1);
+    return `
+      <div class="hist">
+        ${buckets.map((b) => {
+          const h = (b.count / maxCount) * 160;
+          return `
+            <div class="hist__bar-wrap" title="${b.count} طالب">
+              <div class="hist__value mono">${b.count}</div>
+              <div class="hist__bar" style="height: ${h}px; background: ${b.color};"></div>
+              <div class="hist__label">${b.label}</div>
+            </div>
+          `;
+        }).join('')}
+      </div>
+    `;
+  }
+
+  function renderSectionChart(sections) {
+    return `
+      <div class="hbars">
+        ${sections.map((sec) => `
+          <div class="hbar-row">
+            <div class="hbar-row__label">
+              <span class="mono mono--amber">${sec.code}</span>
+              <span>${escapeHtml(sec.title)}</span>
+            </div>
+            <div class="hbar-row__value mono">${sec.pct}%</div>
+            <div class="hbar-track"><div class="hbar-fill" style="width: ${sec.pct}%"></div></div>
+          </div>
+        `).join('')}
+      </div>
+    `;
+  }
+
+  function renderQuestionDifficulty(qStats) {
+    return `
+      <div class="q-diff">
+        ${qStats.map((s, i) => {
+          const cls = s.pct >= 75 ? 'q-diff__cell--easy'
+                   : s.pct >= 40 ? 'q-diff__cell--medium'
+                                 : s.pct >= 1 ? 'q-diff__cell--hard'
+                                              : 'q-diff__cell--none';
+          return `
+            <div class="q-diff__cell ${cls}" title="${s.correct} صحيح / ${s.graded} مصحّح">
+              <div class="q-diff__num mono">Q${i + 1}</div>
+              <div class="q-diff__pct mono">${s.graded ? s.pct + '%' : '—'}</div>
+            </div>
+          `;
+        }).join('')}
+      </div>
+      <div class="q-diff__legend">
+        <span><span class="q-diff__swatch q-diff__cell--easy"></span>سهل ≥75%</span>
+        <span><span class="q-diff__swatch q-diff__cell--medium"></span>متوسط 40-74%</span>
+        <span><span class="q-diff__swatch q-diff__cell--hard"></span>صعب &lt;40%</span>
+        <span><span class="q-diff__swatch q-diff__cell--none"></span>لم يُصحّح</span>
+      </div>
+    `;
   }
 
   /* ========================================================
@@ -618,16 +985,18 @@
     }
 
     const rows = [];
+    const questions = QUIZ_DATA.getAllQuestions();
     // Header
-    const questions = state.students[0].answers;
-    const header = ['#', 'الاسم', 'الصف', 'الرقم', 'المدرسة', 'الإجابات', 'المجموع', 'المدة (ث)', 'وقت البدء', 'وقت التسليم'];
+    const header = ['#', 'الاسم', 'الصف', 'الرقم', 'المدرسة', 'الإجابات المدخلة', 'الأسئلة الكلية', 'الدرجة الكلية %', 'النقاط المكتسبة', 'إجمالي النقاط', 'المدة (د)', 'وقت التسليم'];
     questions.forEach((q, i) => {
-      header.push(`س${i + 1}: ${q.question.slice(0, 60)}`);
+      header.push(`س${i + 1} إجابة`);
+      header.push(`س${i + 1} تصحيح`);
     });
     rows.push(header);
 
     // Data
     state.students.forEach((s, i) => {
+      const summary = computeGradeSummary(s, questions);
       const row = [
         i + 1,
         s.student.name,
@@ -636,12 +1005,16 @@
         s.student.school || '',
         s.score.answered,
         s.score.total,
-        s.meta.durationSeconds,
-        s.meta.startedAt,
+        summary.pct + '%',
+        summary.earned,
+        summary.max,
+        Math.round(s.meta.durationSeconds / 60),
         s.meta.submittedAt
       ];
       s.answers.forEach((a) => {
         row.push(formatAnswerCell(a.answer));
+        const g = getGradeFor(s, a.id);
+        row.push(g === 'correct' ? 'صحيح' : g === 'partial' ? 'جزئي' : g === 'incorrect' ? 'خطأ' : '');
       });
       rows.push(row);
     });
@@ -649,7 +1022,7 @@
     const csv = rows.map((r) => r.map(csvEscape).join(',')).join('\r\n');
     const bom = '﻿';
     downloadFile(fileStem() + '.csv', bom + csv, 'text/csv;charset=utf-8');
-    toast('تم تحميل ملف CSV');
+    toast('تم تحميل ملف CSV مع الدرجات');
   }
 
   function exportJSON() {

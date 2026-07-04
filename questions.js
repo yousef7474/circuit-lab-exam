@@ -357,7 +357,7 @@ const QUIZ_DATA = {
 
   sections: [
     /* ============================================================
-       SECTION 1 — Electricity basics
+       SECTION 1 — Electricity basics (5 questions)
     ============================================================ */
     {
       id: 's1',
@@ -375,48 +375,60 @@ const QUIZ_DATA = {
             { key: 'ج', text: 'الأوم (Ω)' },
             { key: 'د', text: 'الواط (W)' }
           ],
+          answer: 'ج',
           points: 4
         },
         {
           id: 'q2',
-          type: 'image_mcq',
-          title: 'في الدائرة الموضحة: بطارية 9V، وLED يعمل على 2V ويسحب 20mA. ما قيمة المقاومة (R) المناسبة لحماية الـ LED؟',
-          image: { svg: SVG.ledCircuit },
-          hint: 'استخدم قانون أوم: R = V ÷ I، حيث V = فرق الجهد على المقاومة.',
+          type: 'mcq',
+          title: 'ماذا تعني الحروف LED؟',
           options: [
-            { key: 'أ', text: '100 أوم' },
-            { key: 'ب', text: '350 أوم' },
-            { key: 'ج', text: '500 أوم' },
-            { key: 'د', text: '1000 أوم' }
+            { key: 'أ', text: 'Light Emitting Diode (ديود باعث للضوء)' },
+            { key: 'ب', text: 'Long Electric Detector' },
+            { key: 'ج', text: 'Low Energy Device' },
+            { key: 'د', text: 'Light Energy Display' }
           ],
-          points: 5
+          answer: 'أ',
+          points: 3
         },
         {
           id: 'q3',
-          type: 'true_false',
-          title: 'يمكن توصيل مصباح LED مباشرة ببطارية 9V دون الحاجة إلى مقاومة.',
+          type: 'mcq',
+          title: 'ما اللون الشائع للسلك الموجب (+) في الدوائر الكهربائية؟',
+          options: [
+            { key: 'أ', text: 'الأحمر' },
+            { key: 'ب', text: 'الأسود' },
+            { key: 'ج', text: 'الأزرق' },
+            { key: 'د', text: 'الأبيض' }
+          ],
+          answer: 'أ',
           points: 3
         },
         {
           id: 'q4',
-          type: 'short_text',
-          title: 'انظر إلى الرموز التالية (A, B, C, D). اكتب اسم كل قطعة إلكترونية (على الترتيب).',
-          image: { svg: SVG.components },
-          placeholder: 'مثال: A = مقاومة، B = ...',
-          points: 5
+          type: 'true_false',
+          title: 'يمكن توصيل مصباح LED مباشرة ببطارية 9V دون الحاجة إلى مقاومة.',
+          answer: 'خطأ',
+          points: 3
         },
         {
           id: 'q5',
-          type: 'long_text',
-          title: 'ما الفرق بين التيار المستمر (DC) والتيار المتردد (AC)؟ أعطِ مثالاً لكل منهما.',
-          placeholder: 'اكتب إجابتك هنا بجمل مختصرة...',
-          points: 5
+          type: 'mcq',
+          title: 'أيهما أكبر: مقاومة قيمتها 1 كيلو أوم (1 kΩ) أم مقاومة قيمتها 500 أوم (500 Ω)؟',
+          options: [
+            { key: 'أ', text: '1 kΩ أكبر' },
+            { key: 'ب', text: '500 Ω أكبر' },
+            { key: 'ج', text: 'متساويتان' },
+            { key: 'د', text: 'لا يمكن المقارنة بينهما' }
+          ],
+          answer: 'أ',
+          points: 3
         }
       ]
     },
 
     /* ============================================================
-       SECTION 2 — Arduino & microcontrollers
+       SECTION 2 — Arduino & microcontrollers (8 questions)
     ============================================================ */
     {
       id: 's2',
@@ -433,6 +445,7 @@ const QUIZ_DATA = {
             { key: 'ج', text: 'BeagleBone Black' },
             { key: 'د', text: 'Jetson Nano' }
           ],
+          answer: 'أ',
           points: 4
         },
         {
@@ -443,13 +456,40 @@ const QUIZ_DATA = {
           options: [
             { key: 'أ', text: '6 منافذ' },
             { key: 'ب', text: '10 منافذ' },
-            { key: 'ج', text: '14 منفذ' },
+            { key: 'ج', text: '14 منفذاً' },
             { key: 'د', text: '20 منفذاً' }
           ],
+          answer: 'ج',
           points: 4
         },
         {
           id: 'q8',
+          type: 'mcq',
+          title: 'ما الأداة المستخدمة لرفع (تحميل) الكود من الحاسوب إلى لوحة الأردوينو؟',
+          options: [
+            { key: 'أ', text: 'كابل USB' },
+            { key: 'ب', text: 'كابل HDMI' },
+            { key: 'ج', text: 'كابل VGA' },
+            { key: 'د', text: 'لا يمكن رفع الكود إلا لاسلكياً' }
+          ],
+          answer: 'أ',
+          points: 3
+        },
+        {
+          id: 'q9',
+          type: 'mcq',
+          title: 'ما لغة البرمجة التي تُستخدم عادةً لبرمجة الأردوينو؟',
+          options: [
+            { key: 'أ', text: 'HTML' },
+            { key: 'ب', text: 'C / C++' },
+            { key: 'ج', text: 'Photoshop' },
+            { key: 'د', text: 'Word' }
+          ],
+          answer: 'ب',
+          points: 3
+        },
+        {
+          id: 'q10',
           type: 'image_mcq',
           title: 'قارن بين اللوحتين (A) و (B). أي جملة صحيحة تماماً؟',
           image: { svg: SVG.espBoards, caption: 'A = ESP8266 / B = ESP32' },
@@ -459,38 +499,37 @@ const QUIZ_DATA = {
             { key: 'ج', text: 'اللوحة A (ESP8266) هي الأقوى في المعالجة' },
             { key: 'د', text: 'كلتا اللوحتين لا تحتويان على WiFi' }
           ],
+          answer: 'ب',
           points: 4
         },
         {
-          id: 'q9',
+          id: 'q11',
           type: 'mcq',
           title: 'ما وظيفة الدالة setup() في برنامج الأردوينو؟',
           options: [
             { key: 'أ', text: 'تُنفَّذ مرة واحدة فقط عند تشغيل اللوحة (لتهيئة المنافذ والإعدادات)' },
             { key: 'ب', text: 'تُنفَّذ باستمرار في حلقة متكررة' },
-            { key: 'ج', text: 'تُستخدم لطباعة النصوص على الشاشة التسلسلية' },
+            { key: 'ج', text: 'تُستخدم لطباعة النصوص على الشاشة' },
             { key: 'د', text: 'تُستخدم لتأخير تنفيذ البرنامج' }
           ],
+          answer: 'أ',
           points: 4
         },
         {
-          id: 'q10',
-          type: 'short_text',
-          title: 'ما اسم البرنامج (بيئة التطوير) المستخدم لكتابة أكواد الأردوينو وتحميلها على اللوحة؟',
-          placeholder: 'اكتب الاسم هنا...',
+          id: 'q12',
+          type: 'mcq',
+          title: 'يمكن اعتبار المتحكم الدقيق (Microcontroller) في الروبوت بمثابة...',
+          options: [
+            { key: 'أ', text: 'العضلات (يُحرِّك الأجزاء)' },
+            { key: 'ب', text: 'العينين (يرى المحيط)' },
+            { key: 'ج', text: 'الدماغ (يتحكم بكل شيء)' },
+            { key: 'د', text: 'الأذنين (يستمع للأصوات)' }
+          ],
+          answer: 'ج',
           points: 3
         },
         {
-          id: 'q11',
-          type: 'code_reading',
-          title: 'اقرأ الكود التالي بعناية، ثم اشرح بجملة واحدة ماذا يفعل عند تشغيله على لوحة Arduino Uno.',
-          code: CODE_BLINK,
-          codeLang: 'Arduino / C++',
-          placeholder: 'الكود يقوم بـ...',
-          points: 5
-        },
-        {
-          id: 'q12',
+          id: 'q13',
           type: 'image_mcq',
           title: 'بالنظر إلى لوحة Arduino Uno، أي المنافذ التالية يستطيع قراءة إشارة تناظرية (Analog)؟',
           image: { svg: SVG.arduinoUno, caption: 'ARDUINO.UNO / R3' },
@@ -500,13 +539,14 @@ const QUIZ_DATA = {
             { key: 'ج', text: 'المنفذ A0' },
             { key: 'د', text: 'المنفذ GND' }
           ],
+          answer: 'ج',
           points: 4
         }
       ]
     },
 
     /* ============================================================
-       SECTION 3 — Sensors
+       SECTION 3 — Sensors (7 questions)
     ============================================================ */
     {
       id: 's3',
@@ -514,7 +554,7 @@ const QUIZ_DATA = {
       title: 'الحساسات والمستشعرات',
       questions: [
         {
-          id: 'q13',
+          id: 'q14',
           type: 'matching',
           title: 'صل بين كل حساس ووظيفته الصحيحة. اختر من القائمة أمام كل حساس.',
           image: { svg: SVG.sensors, caption: '1: DHT11 · 2: HC-SR04 · 3: LDR · 4: PIR' },
@@ -530,10 +570,11 @@ const QUIZ_DATA = {
             { value: 'light', label: 'قياس شدة الإضاءة' },
             { value: 'motion', label: 'الكشف عن الحركة' }
           ],
+          answer: { a: 'temp_hum', b: 'distance', c: 'light', d: 'motion' },
           points: 8
         },
         {
-          id: 'q14',
+          id: 'q15',
           type: 'mcq',
           title: 'ما نوع الإشارة الخارجة من حساس الضوء LDR (المقاومة الضوئية)؟',
           options: [
@@ -542,33 +583,61 @@ const QUIZ_DATA = {
             { key: 'ج', text: 'بروتوكول I2C' },
             { key: 'د', text: 'إشارة لاسلكية (WiFi)' }
           ],
+          answer: 'أ',
           points: 4
         },
         {
-          id: 'q15',
+          id: 'q16',
           type: 'true_false',
           title: 'يستخدم حساس HC-SR04 الموجات فوق الصوتية (Ultrasonic) لقياس المسافة.',
-          points: 3
-        },
-        {
-          id: 'q16',
-          type: 'short_text',
-          title: 'اذكر تطبيقاً عملياً واحداً يمكن استخدام حساس الحركة PIR فيه.',
-          placeholder: 'مثال: ...',
+          answer: 'صح',
           points: 3
         },
         {
           id: 'q17',
+          type: 'short_text',
+          title: 'اذكر اسم حساس واحد على الأقل سمعت به أو استخدمته من قبل (بالعربي أو الإنجليزي).',
+          placeholder: 'مثال: حساس الحرارة...',
+          points: 3
+        },
+        {
+          id: 'q18',
+          type: 'short_text',
+          title: 'اذكر تطبيقاً عملياً واحداً يمكن استخدام حساس الحركة PIR فيه.',
+          placeholder: 'مثال: إنارة تلقائية عند...',
+          points: 3
+        },
+        {
+          id: 'q19',
           type: 'long_text',
           title: 'صمّم فكرة مشروع بسيط يستخدم حساس حرارة. اذكر: (1) متى يعمل المشروع؟ (2) ما القطع التي ستحتاجها؟ (3) ما الإشارة التي يرسلها للمستخدم؟',
           placeholder: 'مثال: عند وصول الحرارة إلى...',
+          points: 6
+        },
+        {
+          id: 'q20',
+          type: 'matching',
+          title: 'صل بين كل قطعة إلكترونية ووظيفتها الرئيسية.',
+          items: [
+            { id: 'a', label: 'LED', letter: 'أ' },
+            { id: 'b', label: 'Buzzer', letter: 'ب' },
+            { id: 'c', label: 'Motor', letter: 'ج' },
+            { id: 'd', label: 'Sensor', letter: 'د' }
+          ],
+          choices: [
+            { value: 'light', label: 'يعطي ضوءاً' },
+            { value: 'sound', label: 'يعطي صوتاً' },
+            { value: 'movement', label: 'يعطي حركة' },
+            { value: 'data', label: 'يقرأ بيانات من البيئة' }
+          ],
+          answer: { a: 'light', b: 'sound', c: 'movement', d: 'data' },
           points: 6
         }
       ]
     },
 
     /* ============================================================
-       SECTION 4 — Motors & outputs
+       SECTION 4 — Motors & outputs (4 questions)
     ============================================================ */
     {
       id: 's4',
@@ -576,7 +645,7 @@ const QUIZ_DATA = {
       title: 'المحركات والمخرجات',
       questions: [
         {
-          id: 'q18',
+          id: 'q21',
           type: 'image_mcq',
           title: 'انظر إلى المحركات الثلاثة (A, B, C). أيّ محرك يُستخدم عادةً للتحكم بزاوية دقيقة (مثل 0° أو 90° أو 180°)، ويُستخدم غالباً في الروبوتات وأذرع التحكم؟',
           image: { svg: SVG.motors, caption: 'A: DC · B: SERVO · C: STEPPER' },
@@ -586,62 +655,120 @@ const QUIZ_DATA = {
             { key: 'ج', text: 'المحرك C (Stepper)' },
             { key: 'د', text: 'كل المحركات صالحة بنفس الدقة' }
           ],
+          answer: 'ب',
           points: 4
         },
         {
-          id: 'q19',
+          id: 'q22',
           type: 'mcq',
-          title: 'ما الدالة المستخدمة في الأردوينو لتوليد إشارة PWM (للتحكم بشدة الإضاءة أو سرعة المحرك)؟',
+          title: 'ماذا يفعل الطنّان (Buzzer) عند تشغيله؟',
           options: [
-            { key: 'أ', text: 'digitalWrite()' },
-            { key: 'ب', text: 'analogRead()' },
-            { key: 'ج', text: 'analogWrite()' },
-            { key: 'د', text: 'pulseIn()' }
+            { key: 'أ', text: 'يعطي ضوءاً' },
+            { key: 'ب', text: 'يعطي صوتاً' },
+            { key: 'ج', text: 'يعطي حرارة' },
+            { key: 'د', text: 'يعطي حركة' }
           ],
-          points: 4
+          answer: 'ب',
+          points: 3
         },
         {
-          id: 'q20',
-          type: 'long_text',
-          title: 'لماذا لا يُنصح بتوصيل محرك DC كبير مباشرة بمنفذ الأردوينو؟ وما الحل المناسب؟',
-          placeholder: 'السبب... والحل...',
-          points: 5
+          id: 'q23',
+          type: 'mcq',
+          title: 'أي من الآتي يُعتبر مُخرَجاً (Output) في الدائرة؟',
+          options: [
+            { key: 'أ', text: 'LED' },
+            { key: 'ب', text: 'LDR (حساس الضوء)' },
+            { key: 'ج', text: 'DHT11 (حساس الحرارة)' },
+            { key: 'د', text: 'HC-SR04 (حساس المسافة)' }
+          ],
+          answer: 'أ',
+          points: 3
+        },
+        {
+          id: 'q24',
+          type: 'matching',
+          title: 'صنّف كل قطعة إلى مُدخَل (Input) أو مُخرَج (Output).',
+          items: [
+            { id: 'a', label: 'LED', letter: 'أ' },
+            { id: 'b', label: 'Servo Motor', letter: 'ب' },
+            { id: 'c', label: 'زر ضغط (Button)', letter: 'ج' },
+            { id: 'd', label: 'حساس حرارة', letter: 'د' }
+          ],
+          choices: [
+            { value: 'input',  label: 'مُدخَل (Input)' },
+            { value: 'output', label: 'مُخرَج (Output)' }
+          ],
+          answer: { a: 'output', b: 'output', c: 'input', d: 'input' },
+          points: 6
         }
       ]
     },
 
     /* ============================================================
-       SECTION 5 — Communication & IoT
+       SECTION 5 — Communication & Projects (6 questions)
     ============================================================ */
     {
       id: 's5',
       code: 'NET',
-      title: 'الاتصالات وإنترنت الأشياء',
+      title: 'الاتصالات والمشاريع',
       questions: [
         {
-          id: 'q21',
+          id: 'q25',
           type: 'mcq',
-          title: 'أي بروتوكول اتصال يستخدم سلكين فقط هما SDA (البيانات) و SCL (الساعة)؟',
+          title: 'ماذا يعني اختصار IoT؟',
           options: [
-            { key: 'أ', text: 'SPI' },
-            { key: 'ب', text: 'UART' },
-            { key: 'ج', text: 'I2C' },
-            { key: 'د', text: 'CAN' }
+            { key: 'أ', text: 'Internet of Things (إنترنت الأشياء)' },
+            { key: 'ب', text: 'Input of Technology' },
+            { key: 'ج', text: 'Integrated Object Tools' },
+            { key: 'د', text: 'Information on Tables' }
           ],
-          points: 4
-        },
-        {
-          id: 'q22',
-          type: 'true_false',
-          title: 'لوحة ESP32 تحتوي على WiFi و Bluetooth مدمجين بداخلها.',
+          answer: 'أ',
           points: 3
         },
         {
-          id: 'q23',
+          id: 'q26',
+          type: 'true_false',
+          title: 'لوحة ESP32 تحتوي على WiFi و Bluetooth مدمجَين بداخلها.',
+          answer: 'صح',
+          points: 3
+        },
+        {
+          id: 'q27',
+          type: 'matching',
+          title: 'صل بين كل تقنية اتصال ومداها/طبيعتها.',
+          items: [
+            { id: 'a', label: 'WiFi', letter: 'أ' },
+            { id: 'b', label: 'Bluetooth', letter: 'ب' },
+            { id: 'c', label: 'USB', letter: 'ج' }
+          ],
+          choices: [
+            { value: 'wifi',  label: 'اتصال لاسلكي بمدى متوسط (داخل المبنى)' },
+            { value: 'bt',    label: 'اتصال لاسلكي بمدى قصير جداً' },
+            { value: 'wired', label: 'اتصال سلكي مباشر' }
+          ],
+          answer: { a: 'wifi', b: 'bt', c: 'wired' },
+          points: 5
+        },
+        {
+          id: 'q28',
+          type: 'true_false',
+          title: 'البلوتوث يحتاج إلى اتصال بالإنترنت ليعمل بين جهازين.',
+          answer: 'خطأ',
+          points: 3
+        },
+        {
+          id: 'q29',
           type: 'long_text',
           title: 'اذكر فكرة مشروع بسيط يمكن تنفيذه باستخدام إنترنت الأشياء (IoT). حدد: القطع/الحساسات المستخدمة، وكيف تستفيد من الاتصال بالإنترنت في المشروع.',
           placeholder: 'مثال: نظام ري ذكي...',
           points: 6
+        },
+        {
+          id: 'q30',
+          type: 'long_text',
+          title: 'لو أعطيتك حرية اختيار أي مشروع من عالم الإلكترونيات لتبنيه — ما هو ذلك المشروع؟ ولماذا؟',
+          placeholder: 'اكتب فكرتك بحرية...',
+          points: 4
         }
       ]
     }

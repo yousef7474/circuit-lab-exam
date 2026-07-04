@@ -277,6 +277,46 @@ button {
   transform: translateY(-1px);
 }
 
+/* ------------------------------------------------------------
+   Mawhiba program badge — used across all pages
+------------------------------------------------------------ */
+.mawhiba-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  padding: 8px 16px;
+  background: linear-gradient(135deg, rgba(184, 134, 11, 0.12), rgba(14, 116, 144, 0.08));
+  border: 1px solid var(--border-normal);
+  border-radius: 999px;
+  font-family: var(--font-display);
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--amber);
+  letter-spacing: 0.01em;
+  transition: transform var(--dur-fast) var(--ease);
+}
+.mawhiba-badge:hover {
+  transform: translateY(-1px);
+}
+.mawhiba-badge__icon {
+  width: 18px;
+  height: 18px;
+  flex-shrink: 0;
+}
+.mawhiba-badge--sm {
+  padding: 4px 10px;
+  font-size: 11px;
+  font-weight: 500;
+  gap: 6px;
+}
+.mawhiba-badge--sm .mawhiba-badge__icon { width: 12px; height: 12px; }
+.mawhiba-badge--hero {
+  padding: 10px 20px;
+  font-size: 15px;
+  box-shadow: 0 4px 20px rgba(184, 134, 11, 0.1);
+}
+.mawhiba-badge--hero .mawhiba-badge__icon { width: 22px; height: 22px; }
+
 .signal-dot {
   display: inline-block;
   width: 8px;
@@ -2882,40 +2922,200 @@ textarea.q-text-input {
 }
 
 /* ------------------------------------------------------------
-   11. Responsive
+   11. Responsive — iPad + Mobile
 ------------------------------------------------------------ */
-@media (max-width: 1100px) {
-  .welcome-grid { grid-template-columns: 1fr; padding: 32px; gap: 40px; }
-  .quiz-body { grid-template-columns: 1fr; padding: 20px; }
-  .quiz-nav { position: static; max-height: none; }
-  .nav-questions { grid-template-columns: repeat(10, 1fr); }
-  .results-summary { grid-template-columns: repeat(2, 1fr); }
-  .hero-stats { grid-template-columns: repeat(2, 1fr); }
+
+/* ===== iPad / tablet landscape ===== */
+@media (max-width: 1200px) {
+  .quiz-body { grid-template-columns: 260px 1fr; padding: 24px; gap: 20px; }
+  .nav-questions { grid-template-columns: repeat(5, 1fr); }
+  .dash-body { grid-template-columns: 320px 1fr; }
+  .about-values { grid-template-columns: repeat(3, 1fr); gap: 12px; }
+  .how-grid { grid-template-columns: repeat(2, 1fr); }
 }
 
-@media (max-width: 720px) {
+/* ===== iPad portrait / small tablet ===== */
+@media (max-width: 1024px) {
+  /* Welcome */
+  .welcome-grid { grid-template-columns: 1fr; padding: 40px 28px; gap: 40px; }
+  .hero-stats { grid-template-columns: repeat(4, 1fr); }
+
+  /* Quiz */
+  .quiz-body { grid-template-columns: 1fr; padding: 20px; gap: 20px; }
+  .quiz-nav { position: static; max-height: none; order: 2; }
+  .quiz-main { order: 1; }
+  .nav-questions { grid-template-columns: repeat(10, 1fr); }
+
+  /* Teacher dashboard */
+  .dash-body { grid-template-columns: 1fr; }
+  .students-panel { min-height: auto; }
+  .students-list { max-height: 400px; }
+  .details-panel { min-height: 500px; }
+  .details-body { max-height: none; }
+  .dash-stats { grid-template-columns: repeat(4, 1fr); }
+  .dash-header__actions { flex-wrap: wrap; }
+
+  /* Grade summary + charts */
+  .grade-summary { grid-template-columns: 1fr; gap: 12px; }
+  .grade-summary__side { grid-template-columns: repeat(3, 1fr); }
+  .grade-summary__pct { font-size: 48px; }
+  .chart-hero { grid-template-columns: 1fr; gap: 20px; }
+  .chart-hero__value { font-size: 68px; }
+
+  /* Results */
+  .results-summary { grid-template-columns: repeat(2, 1fr); }
+  .actions-grid { grid-template-columns: repeat(2, 1fr); }
+
+  /* About */
+  .about-values { grid-template-columns: repeat(3, 1fr); }
+  .how-grid { grid-template-columns: repeat(2, 1fr); }
+}
+
+/* ===== Mobile landscape / large phone ===== */
+@media (max-width: 780px) {
   body { font-size: 15px; }
-  .brand-strip { flex-direction: column; gap: 6px; padding: 12px 16px; text-align: center; }
-  .welcome-grid { padding: 24px 20px; gap: 32px; }
-  .welcome-panel { padding: 28px 24px; }
-  .hero-title { font-size: 68px; }
-  .hero-title__line--accent { padding-inline-start: 32px; }
-  .hero-title__line--accent::before { width: 20px; }
+
+  /* Ambient */
+  .ambient-grid { background-size: 32px 32px; }
+
+  /* Welcome */
+  .brand-strip {
+    flex-direction: column;
+    gap: 8px;
+    padding: 12px 16px;
+    text-align: center;
+  }
+  .brand-strip__left, .brand-strip__right { flex-wrap: wrap; justify-content: center; }
+  .welcome-grid { padding: 24px 16px; gap: 28px; }
+  .welcome-hero { text-align: right; }
+  .hero-title { font-size: 60px; }
+  .hero-title__line--accent { padding-inline-start: 26px; }
+  .hero-title__line--accent::before { width: 16px; }
+  .hero-subtitle { font-size: 18px; }
+  .hero-description { font-size: 15px; }
   .hero-stats { grid-template-columns: repeat(2, 1fr); }
-  .quiz-header { flex-direction: column; padding: 14px 16px; gap: 12px; }
-  .quiz-header__left, .quiz-header__right { width: 100%; justify-content: space-between; }
+  .welcome-panel { padding: 24px 20px; }
+  .panel-title { font-size: 28px; }
+
+  /* Quiz */
+  .quiz-header { flex-direction: column; padding: 12px 14px; gap: 10px; align-items: stretch; }
+  .quiz-header__left, .quiz-header__right { width: 100%; justify-content: space-between; gap: 10px; flex-wrap: wrap; }
+  .quiz-header__right { flex-wrap: wrap; }
+  .chip-logo { width: 34px; height: 34px; }
+  .quiz-brand__sub { font-size: 13px; }
   .student-badge { display: none; }
-  .quiz-body { padding: 16px; gap: 20px; }
-  .question-shell { padding: 24px 20px; }
-  .q-title { font-size: 20px; }
-  .quiz-actions { flex-direction: column-reverse; }
-  .quiz-actions .btn { width: 100%; }
+  .timer { min-width: 130px; padding: 6px 12px; }
+  .timer__value { font-size: 20px; }
+  .progress-info { min-width: 140px; }
+  .quiz-body { padding: 14px; gap: 16px; }
+  .question-shell { padding: 22px 18px; min-height: 300px; }
+  .q-head { flex-direction: column; align-items: flex-start; gap: 10px; }
+  .q-title { font-size: 19px; line-height: 1.5; }
+  .opt { padding: 12px 14px; gap: 10px; }
+  .opt__text { font-size: 14px; }
   .opt-list--tf { grid-template-columns: 1fr; }
   .matching-grid { grid-template-columns: 1fr; }
+  .matching-item { flex-wrap: wrap; }
+  .matching-select { width: 100%; margin-inline-start: 0; margin-top: 6px; }
+  .quiz-actions { flex-direction: column-reverse; gap: 8px; }
+  .quiz-actions .btn { width: 100%; }
+  .q-image { padding: 16px; }
+
+  /* Teacher dashboard */
+  .dash-screen { padding: 16px 12px; }
+  .dash-header { flex-direction: column; align-items: stretch; gap: 12px; padding: 12px 16px; }
+  .dash-brand { flex-wrap: wrap; }
+  .dash-header__actions {
+    justify-content: flex-start;
+    overflow-x: auto;
+    padding-bottom: 4px;
+  }
+  .dash-stats { grid-template-columns: repeat(2, 1fr); gap: 8px; }
+  .dash-stat { padding: 14px 16px; }
+  .dash-stat__value { font-size: 22px; }
+  .grade-summary { padding: 16px; }
+  .grade-summary__side { grid-template-columns: 1fr; }
+  .grade-summary__pct { font-size: 42px; }
+  .details-tabs { flex-wrap: wrap; }
+  .details-tab { flex: 1 1 33%; padding: 12px 14px; font-size: 13px; }
+  .details-body { padding: 20px 16px; }
+  .detail-head { flex-direction: column; align-items: flex-start; gap: 12px; }
+  .detail-head__actions { flex-wrap: wrap; }
+  .detail-summary { grid-template-columns: 1fr; }
+  .grade-btns { flex-wrap: wrap; }
+  .grade-btn { flex: 1; min-width: 90px; }
+
+  /* Charts */
+  .chart-hero { padding: 20px; }
+  .chart-hero__value { font-size: 58px; }
+  .chart-hero__meta { grid-template-columns: 1fr; }
+  .chart-card { padding: 16px 18px; }
+  .hist { height: 180px; gap: 8px; }
+  .hist__label { font-size: 9px; padding: 3px 0; }
+  .q-diff { grid-template-columns: repeat(auto-fill, minmax(64px, 1fr)); }
+  .q-diff__cell { padding: 8px 4px; }
+  .q-diff__pct { font-size: 13px; }
+  .q-diff__legend { gap: 10px; font-size: 11px; }
+
+  /* Results */
+  .screen--results { padding: 24px 12px; }
+  .results-title { font-size: 30px; }
   .results-summary { grid-template-columns: 1fr; }
   .actions-grid { grid-template-columns: 1fr; }
-  .results-title { font-size: 32px; }
+  .check-frame { width: 90px; height: 90px; }
+
+  /* About */
+  .about-wrap { padding: 16px 12px; }
+  .about-topbar { flex-direction: column; gap: 10px; padding: 12px 16px; }
+  .about-title { font-size: 44px; }
+  .about-lede { font-size: 16px; }
+  .about-values { grid-template-columns: 1fr; }
+  .about-section-head h2 { font-size: 28px; }
+  .section-block { padding: 20px 22px; }
+  .section-block__head { flex-direction: column; align-items: flex-start; gap: 6px; }
+  .how-grid { grid-template-columns: 1fr; }
+  .about-cta { padding: 40px 24px; }
+  .about-cta h2 { font-size: 32px; }
+
+  /* QR page */
+  .qr-wrap { padding: 20px 12px; }
+  .qr-poster { padding: 24px; grid-template-columns: 1fr; gap: 24px; }
+  .qr-topbar { flex-direction: column; gap: 10px; align-items: stretch; }
+  .qr-actions { justify-content: center; }
+  .qr-headline { font-size: 36px; }
+
+  /* Modal */
   .modal__panel { min-width: 0; width: calc(100% - 32px); margin: 16px; padding: 24px; }
+
+  /* Badge sizing */
+  .mawhiba-badge--hero { font-size: 13px; padding: 8px 16px; }
+}
+
+/* ===== Small phone ===== */
+@media (max-width: 480px) {
+  .hero-title { font-size: 48px; }
+  .hero-stats { grid-template-columns: 1fr 1fr; gap: 8px; }
+  .stat__value { font-size: 26px; }
+  .panel-title { font-size: 24px; }
+  .btn--start { padding: 14px 20px; }
+  .btn--start .btn__label > span:first-child { font-size: 15px; }
+  .field input, .field textarea { padding: 10px 12px; font-size: 14px; }
+  .question-shell { padding: 18px 14px; }
+  .q-title { font-size: 17px; }
+  .q-crumb { gap: 8px; font-size: 11px; }
+  .q-section-badge, .q-type-badge { font-size: 10px; padding: 3px 8px; }
+  .q-image { padding: 12px; }
+  .q-image svg { max-height: 260px; }
+  .dash-stats { grid-template-columns: 1fr 1fr; }
+  .grade-summary__pct { font-size: 36px; }
+  .chart-hero__value { font-size: 48px; }
+  .details-tab { flex-basis: 100%; }
+  .about-title { font-size: 36px; }
+  .about-cta h2 { font-size: 26px; }
+  .qr-headline { font-size: 30px; }
+  #qr-canvas svg, #qr-canvas canvas { width: 220px; height: 220px; }
+  .mawhiba-badge { font-size: 12px; padding: 6px 12px; }
+  .mawhiba-badge--hero { font-size: 12px; padding: 6px 14px; }
 }
 
 /* Reduce motion */

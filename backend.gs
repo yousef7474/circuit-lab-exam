@@ -19,7 +19,7 @@
  */
 
 // ⚙️ غيّر هذه إلى كلمة مرور قوية (12+ حرفاً موصى بها)
-const TEACHER_TOKEN = 'CHANGE_ME_TO_A_STRONG_PASSWORD';
+const TEACHER_TOKEN = 'Khh@8956';
 
 // اسم الورقة داخل الملف (يُنشأ تلقائياً)
 const SHEET_NAME = 'Results';

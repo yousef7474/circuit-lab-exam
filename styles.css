@@ -445,10 +445,12 @@ button {
 }
 
 .hero-instructions {
-  border: 1px solid var(--border-hairline);
-  background: rgba(11, 17, 32, 0.6);
+  border: 1px solid var(--border-subtle);
+  background: var(--bg-surface);
   padding: 20px 24px;
   max-width: 640px;
+  border-radius: var(--r-sm);
+  box-shadow: 0 2px 12px rgba(184, 134, 11, 0.04);
 }
 .instructions-header {
   padding-bottom: 12px;

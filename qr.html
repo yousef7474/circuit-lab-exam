@@ -1,0 +1,511 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>رمز QR للاختبار — CIRCUIT.LAB</title>
+  <link rel="icon" type="image/svg+xml" href="favicon.svg" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Reem+Kufi:wght@400;500;600;700&family=Tajawal:wght@300;400;500;700;800&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="styles.css" />
+  <style>
+    /* QR page specific */
+    .qr-wrap {
+      position: relative;
+      z-index: 1;
+      max-width: 900px;
+      margin: 0 auto;
+      padding: 32px 24px;
+    }
+    .qr-topbar {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 14px 22px;
+      margin-bottom: 24px;
+      border: 1px solid var(--border-subtle);
+      background: linear-gradient(180deg, rgba(255,255,255,0.9), rgba(251,247,238,0.8));
+    }
+    .qr-actions {
+      display: flex;
+      gap: 8px;
+      flex-wrap: wrap;
+    }
+    .qr-poster {
+      display: grid;
+      grid-template-columns: 1.4fr 1fr;
+      gap: 32px;
+      align-items: stretch;
+      padding: 44px;
+      background: var(--bg-surface);
+      border: 1px solid var(--border-subtle);
+      border-radius: var(--r-md);
+      position: relative;
+      overflow: hidden;
+      box-shadow: 0 8px 40px rgba(0, 0, 0, 0.04);
+    }
+    .qr-poster::before {
+      content: '';
+      position: absolute;
+      top: 0; left: 0;
+      width: 100px;
+      height: 4px;
+      background: var(--amber);
+    }
+    .qr-poster::after {
+      content: '';
+      position: absolute;
+      bottom: 0; right: 0;
+      width: 100px;
+      height: 4px;
+      background: var(--cyan);
+    }
+
+    .qr-info {
+      display: flex;
+      flex-direction: column;
+      gap: 20px;
+      padding: 10px 0;
+    }
+    .qr-brand {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      margin-bottom: 4px;
+    }
+    .qr-brand__chip {
+      width: 44px;
+      height: 44px;
+      color: var(--amber);
+    }
+    .qr-brand__title {
+      font-family: var(--font-mono);
+      font-size: 11px;
+      color: var(--amber);
+      letter-spacing: 0.12em;
+    }
+    .qr-brand__sub {
+      font-family: var(--font-display);
+      font-size: 22px;
+      font-weight: 700;
+      color: var(--text-primary);
+      margin-top: 2px;
+    }
+    .qr-headline {
+      font-family: var(--font-display);
+      font-size: clamp(38px, 5vw, 56px);
+      line-height: 1.05;
+      font-weight: 700;
+      color: var(--text-primary);
+    }
+    .qr-headline__accent {
+      color: var(--amber);
+      display: block;
+    }
+    .qr-desc {
+      font-size: 17px;
+      color: var(--text-secondary);
+      line-height: 1.7;
+      max-width: 440px;
+    }
+    .qr-instruct {
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+      padding: 18px 20px;
+      border: 1px solid var(--border-hairline);
+      background: var(--bg-inset);
+      border-radius: var(--r-sm);
+    }
+    .qr-instruct__title {
+      font-family: var(--font-mono);
+      font-size: 11px;
+      color: var(--amber);
+      letter-spacing: 0.1em;
+    }
+    .qr-instruct ol {
+      list-style: none;
+      counter-reset: step;
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+    }
+    .qr-instruct li {
+      counter-increment: step;
+      display: flex;
+      gap: 10px;
+      font-size: 14px;
+      color: var(--text-secondary);
+      line-height: 1.5;
+    }
+    .qr-instruct li::before {
+      content: counter(step);
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      width: 22px;
+      height: 22px;
+      background: var(--amber);
+      color: white;
+      font-family: var(--font-mono);
+      font-size: 11px;
+      font-weight: 700;
+      border-radius: 50%;
+      flex-shrink: 0;
+    }
+
+    .qr-visual {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 16px;
+      padding: 32px 24px;
+      background: var(--bg-inset);
+      border: 1px solid var(--border-subtle);
+      border-radius: var(--r-md);
+      position: relative;
+    }
+    .qr-visual__corners span {
+      position: absolute;
+      width: 22px;
+      height: 22px;
+      border-color: var(--amber);
+      border-style: solid;
+      border-width: 0;
+    }
+    .qr-visual__corners .c-tl { top: 10px; right: 10px; border-top-width: 3px; border-right-width: 3px; }
+    .qr-visual__corners .c-tr { top: 10px; left: 10px;  border-top-width: 3px; border-left-width: 3px; }
+    .qr-visual__corners .c-bl { bottom: 10px; right: 10px; border-bottom-width: 3px; border-right-width: 3px; }
+    .qr-visual__corners .c-br { bottom: 10px; left: 10px;  border-bottom-width: 3px; border-left-width: 3px; }
+
+    .qr-canvas-wrap {
+      padding: 16px;
+      background: white;
+      border-radius: var(--r-sm);
+      box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+      display: inline-flex;
+    }
+    #qr-canvas svg,
+    #qr-canvas canvas {
+      display: block;
+      width: 280px;
+      height: 280px;
+    }
+    .qr-visual__caption {
+      font-family: var(--font-mono);
+      font-size: 11px;
+      color: var(--amber);
+      letter-spacing: 0.08em;
+    }
+    .qr-url {
+      padding: 10px 16px;
+      background: white;
+      border: 1px solid var(--border-hairline);
+      border-radius: var(--r-sm);
+      font-family: var(--font-mono);
+      font-size: 12px;
+      color: var(--text-primary);
+      max-width: 100%;
+      word-break: break-all;
+      text-align: center;
+      line-height: 1.5;
+    }
+
+    .qr-loading {
+      color: var(--text-muted);
+      font-size: 14px;
+      padding: 40px;
+    }
+
+    /* Custom URL input */
+    .url-config {
+      margin-top: 20px;
+      padding: 16px 20px;
+      background: var(--bg-surface);
+      border: 1px solid var(--border-hairline);
+      border-radius: var(--r-sm);
+    }
+    .url-config summary {
+      cursor: pointer;
+      color: var(--text-secondary);
+      font-size: 14px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      list-style: none;
+    }
+    .url-config summary::-webkit-details-marker { display: none; }
+    .url-config summary::before {
+      content: '›';
+      font-family: var(--font-mono);
+      color: var(--amber);
+      transition: transform var(--dur-fast) var(--ease);
+    }
+    .url-config[open] summary::before { transform: rotate(-90deg); }
+    .url-config__body {
+      margin-top: 14px;
+      padding-top: 14px;
+      border-top: 1px dashed var(--border-hairline);
+      display: flex;
+      gap: 8px;
+    }
+    .url-config input {
+      flex: 1;
+      padding: 8px 12px;
+      background: var(--bg-void);
+      border: 1px solid var(--border-hairline);
+      color: var(--text-primary);
+      font-family: var(--font-mono);
+      font-size: 13px;
+      border-radius: var(--r-sm);
+    }
+    .url-config input:focus {
+      outline: none;
+      border-color: var(--amber);
+    }
+
+    /* Print — poster only */
+    @media print {
+      body * { visibility: hidden; }
+      .qr-poster, .qr-poster * { visibility: visible; }
+      .qr-poster {
+        position: absolute;
+        left: 0;
+        top: 0;
+        width: 100%;
+        border: none;
+        box-shadow: none;
+        padding: 20px;
+      }
+      .ambient-grid, .ambient-noise, .ambient-glow { display: none !important; }
+    }
+
+    @media (max-width: 780px) {
+      .qr-poster { grid-template-columns: 1fr; padding: 28px; }
+      .qr-topbar { flex-direction: column; gap: 12px; align-items: stretch; }
+    }
+  </style>
+</head>
+<body>
+  <div class="ambient-grid" aria-hidden="true"></div>
+  <div class="ambient-noise" aria-hidden="true"></div>
+  <div class="ambient-glow ambient-glow--amber" aria-hidden="true"></div>
+  <div class="ambient-glow ambient-glow--cyan" aria-hidden="true"></div>
+
+  <div class="qr-wrap">
+    <!-- Top bar with actions -->
+    <div class="qr-topbar">
+      <div style="display: flex; align-items: center; gap: 12px;">
+        <span class="mono mono--amber">CIRCUIT.LAB / QR.SHARE</span>
+        <span class="mono mono--dim">توليد رمز مشاركة</span>
+      </div>
+      <div class="qr-actions">
+        <button class="btn btn--ghost btn--sm" id="btn-print">🖨 طباعة</button>
+        <button class="btn btn--ghost btn--sm" id="btn-download-png">تحميل PNG</button>
+        <button class="btn btn--ghost btn--sm" id="btn-download-svg">تحميل SVG</button>
+        <button class="btn btn--ghost btn--sm" id="btn-copy-url">نسخ الرابط</button>
+        <a href="teacher.html" class="btn btn--ghost btn--sm">لوحة المعلم →</a>
+      </div>
+    </div>
+
+    <!-- Poster (printable) -->
+    <div class="qr-poster">
+      <!-- Info side -->
+      <div class="qr-info">
+        <div class="qr-brand">
+          <div class="qr-brand__chip">
+            <svg viewBox="0 0 40 40">
+              <rect x="8" y="8" width="24" height="24" rx="2" fill="none" stroke="currentColor" stroke-width="1.5"/>
+              <rect x="14" y="14" width="12" height="12" fill="currentColor" opacity="0.15"/>
+              <circle cx="20" cy="20" r="1.5" fill="currentColor"/>
+              <line x1="4" y1="14" x2="8" y2="14" stroke="currentColor" stroke-width="1.2"/>
+              <line x1="4" y1="20" x2="8" y2="20" stroke="currentColor" stroke-width="1.2"/>
+              <line x1="4" y1="26" x2="8" y2="26" stroke="currentColor" stroke-width="1.2"/>
+              <line x1="32" y1="14" x2="36" y2="14" stroke="currentColor" stroke-width="1.2"/>
+              <line x1="32" y1="20" x2="36" y2="20" stroke="currentColor" stroke-width="1.2"/>
+              <line x1="32" y1="26" x2="36" y2="26" stroke="currentColor" stroke-width="1.2"/>
+            </svg>
+          </div>
+          <div>
+            <div class="qr-brand__title">CIRCUIT.LAB</div>
+            <div class="qr-brand__sub">الاختبار القبلي</div>
+          </div>
+        </div>
+
+        <h1 class="qr-headline">
+          امسح الرمز
+          <span class="qr-headline__accent">وابدأ الاختبار</span>
+        </h1>
+
+        <p class="qr-desc">
+          افتح كاميرا جوالك ووجّهها إلى الرمز أدناه، أو اطلب من الجهاز مسحه — سيفتح الاختبار فوراً.
+        </p>
+
+        <div class="qr-instruct">
+          <span class="qr-instruct__title">HOW TO SCAN</span>
+          <ol>
+            <li>افتح تطبيق الكاميرا في هاتفك.</li>
+            <li>وجّه الكاميرا نحو الرمز.</li>
+            <li>اضغط على الرابط الذي يظهر.</li>
+            <li>ابدأ الاختبار مباشرة.</li>
+          </ol>
+        </div>
+      </div>
+
+      <!-- Visual side -->
+      <div class="qr-visual">
+        <div class="qr-visual__corners">
+          <span class="c-tl"></span>
+          <span class="c-tr"></span>
+          <span class="c-bl"></span>
+          <span class="c-br"></span>
+        </div>
+
+        <span class="qr-visual__caption">SCAN.ME</span>
+
+        <div class="qr-canvas-wrap">
+          <div id="qr-canvas">
+            <div class="qr-loading">جارٍ توليد الرمز...</div>
+          </div>
+        </div>
+
+        <div class="qr-url" id="qr-url">https://yousef7474.github.io/circuit-lab-exam/</div>
+      </div>
+    </div>
+
+    <!-- URL config (advanced) -->
+    <details class="url-config">
+      <summary>
+        <span class="mono mono--amber">CUSTOMIZE</span>
+        تغيير الرابط الذي سيُشفَّر في الرمز
+      </summary>
+      <div class="url-config__body">
+        <input type="url" id="url-input" placeholder="https://..." />
+        <button class="btn btn--primary btn--sm" id="btn-regenerate">توليد</button>
+      </div>
+    </details>
+  </div>
+
+  <!-- QR Code library (small, from CDN) -->
+  <script src="https://cdn.jsdelivr.net/npm/qrcode-generator@1.4.4/qrcode.js"></script>
+  <script>
+    (function () {
+      const DEFAULT_URL = 'https://yousef7474.github.io/circuit-lab-exam/';
+      const $ = (s) => document.querySelector(s);
+
+      let currentSVG = '';
+      let currentUrl = DEFAULT_URL;
+
+      function generateQR(url) {
+        currentUrl = url;
+        const qr = qrcode(0, 'H');   // auto type-number, H = highest error correction (~30%)
+        qr.addData(url);
+        qr.make();
+
+        const cellSize = 8;
+        const margin = 2;
+        const modules = qr.getModuleCount();
+        const size = (modules + margin * 2) * cellSize;
+
+        // Build custom styled SVG (rounded modules, brand colors)
+        let svg = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 ${size} ${size}" width="280" height="280" shape-rendering="crispEdges">`;
+        svg += `<rect width="${size}" height="${size}" fill="#ffffff"/>`;
+        for (let r = 0; r < modules; r++) {
+          for (let c = 0; c < modules; c++) {
+            if (qr.isDark(r, c)) {
+              const x = (c + margin) * cellSize;
+              const y = (r + margin) * cellSize;
+              svg += `<rect x="${x}" y="${y}" width="${cellSize}" height="${cellSize}" fill="#0a0e1a"/>`;
+            }
+          }
+        }
+        svg += `</svg>`;
+
+        currentSVG = svg;
+        $('#qr-canvas').innerHTML = svg;
+        $('#qr-url').textContent = url;
+      }
+
+      function downloadFile(filename, content, mime) {
+        const blob = new Blob([content], { type: mime });
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = filename;
+        document.body.appendChild(a);
+        a.click();
+        document.body.removeChild(a);
+        setTimeout(() => URL.revokeObjectURL(url), 100);
+      }
+
+      function downloadPNG() {
+        // Convert SVG to PNG via canvas
+        const img = new Image();
+        const svgBlob = new Blob([currentSVG], { type: 'image/svg+xml;charset=utf-8' });
+        const svgUrl = URL.createObjectURL(svgBlob);
+        img.onload = () => {
+          const canvas = document.createElement('canvas');
+          const size = 1024;
+          canvas.width = size;
+          canvas.height = size;
+          const ctx = canvas.getContext('2d');
+          ctx.fillStyle = '#ffffff';
+          ctx.fillRect(0, 0, size, size);
+          ctx.imageSmoothingEnabled = false;
+          ctx.drawImage(img, 0, 0, size, size);
+          canvas.toBlob((blob) => {
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = 'circuit-lab-qr.png';
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+            URL.revokeObjectURL(url);
+          }, 'image/png');
+          URL.revokeObjectURL(svgUrl);
+        };
+        img.src = svgUrl;
+      }
+
+      $('#btn-print').addEventListener('click', () => window.print());
+      $('#btn-download-svg').addEventListener('click', () => {
+        downloadFile('circuit-lab-qr.svg', currentSVG, 'image/svg+xml;charset=utf-8');
+      });
+      $('#btn-download-png').addEventListener('click', downloadPNG);
+      $('#btn-copy-url').addEventListener('click', async () => {
+        try {
+          await navigator.clipboard.writeText(currentUrl);
+          const btn = $('#btn-copy-url');
+          const original = btn.textContent;
+          btn.textContent = '✓ تم النسخ';
+          setTimeout(() => (btn.textContent = original), 1600);
+        } catch (e) {
+          alert('تعذّر النسخ');
+        }
+      });
+      $('#btn-regenerate').addEventListener('click', () => {
+        const val = $('#url-input').value.trim();
+        if (!val) return;
+        generateQR(val);
+      });
+      $('#url-input').addEventListener('keydown', (e) => {
+        if (e.key === 'Enter') { e.preventDefault(); $('#btn-regenerate').click(); }
+      });
+
+      // Wait for library then generate
+      function tryGenerate() {
+        if (typeof qrcode === 'undefined') {
+          setTimeout(tryGenerate, 100);
+          return;
+        }
+        $('#url-input').value = DEFAULT_URL;
+        generateQR(DEFAULT_URL);
+      }
+      tryGenerate();
+    })();
+  </script>
+</body>
+</html>

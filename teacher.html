@@ -1,0 +1,247 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>لوحة المعلم — CIRCUIT.LAB</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Reem+Kufi:wght@400;500;600;700&family=Tajawal:wght@300;400;500;700;800&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+  <!-- Ambient layers -->
+  <div class="ambient-grid" aria-hidden="true"></div>
+  <div class="ambient-noise" aria-hidden="true"></div>
+  <div class="ambient-glow ambient-glow--amber" aria-hidden="true"></div>
+  <div class="ambient-glow ambient-glow--cyan" aria-hidden="true"></div>
+
+  <!-- ============================================================
+       AUTH SCREEN — Ask for teacher token
+  ============================================================ -->
+  <div class="dash-screen" id="screen-auth">
+    <div class="auth-frame">
+      <div class="panel-corners">
+        <span class="corner corner--tl"></span>
+        <span class="corner corner--tr"></span>
+        <span class="corner corner--bl"></span>
+        <span class="corner corner--br"></span>
+      </div>
+      <span class="auth-badge">TEACHER.LOGIN</span>
+      <h1 class="auth-title">لوحة المعلم</h1>
+      <p class="auth-caption">
+        أدخل كلمة المرور التي حدّدتها في ملف <code style="background:var(--bg-void);padding:2px 6px;border-radius:2px;color:var(--amber);font-family:var(--font-mono);font-size:12px">backend.gs</code>
+      </p>
+
+      <form class="auth-form" id="auth-form" novalidate>
+        <input type="password" id="auth-token" placeholder="كلمة مرور المعلم" autocomplete="off" required />
+        <div id="auth-error" class="auth-error hidden"></div>
+        <button type="submit" class="btn btn--primary">
+          دخول
+          <svg viewBox="0 0 24 24" width="16" height="16"><path d="M14 6l-6 6 6 6" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        </button>
+        <div class="auth-hint">
+          <strong style="color: var(--amber);">تنبيه:</strong>
+          يجب أن يكون الخادم مُهيَّأ. راجع <code>README.md</code> لخطوات الإعداد.
+          إن لم تُنشئ الخادم بعد، لن تعمل هذه الصفحة.
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- ============================================================
+       DASHBOARD SCREEN
+  ============================================================ -->
+  <div class="dash-screen hidden" id="screen-dashboard">
+    <!-- Header -->
+    <header class="dash-header">
+      <div class="dash-brand">
+        <div class="dash-brand__chip">
+          <svg viewBox="0 0 40 40">
+            <rect x="8" y="8" width="24" height="24" rx="2" fill="none" stroke="currentColor" stroke-width="1.5"/>
+            <rect x="14" y="14" width="12" height="12" fill="currentColor" opacity="0.15"/>
+            <circle cx="20" cy="20" r="1.5" fill="currentColor"/>
+            <line x1="4" y1="14" x2="8" y2="14" stroke="currentColor" stroke-width="1.2"/>
+            <line x1="4" y1="20" x2="8" y2="20" stroke="currentColor" stroke-width="1.2"/>
+            <line x1="4" y1="26" x2="8" y2="26" stroke="currentColor" stroke-width="1.2"/>
+            <line x1="32" y1="14" x2="36" y2="14" stroke="currentColor" stroke-width="1.2"/>
+            <line x1="32" y1="20" x2="36" y2="20" stroke="currentColor" stroke-width="1.2"/>
+            <line x1="32" y1="26" x2="36" y2="26" stroke="currentColor" stroke-width="1.2"/>
+          </svg>
+        </div>
+        <div>
+          <div class="dash-brand__title">CIRCUIT.LAB / TEACHER.DASH</div>
+          <div class="dash-brand__sub">لوحة نتائج الطلاب</div>
+        </div>
+      </div>
+
+      <div class="dash-header__actions">
+        <div class="dash-conn" id="dash-conn">
+          <span class="dash-conn__dot"></span>
+          <span id="dash-conn-text">جارٍ الاتصال...</span>
+        </div>
+
+        <label class="dash-refresh-toggle">
+          <input type="checkbox" id="auto-refresh-toggle" checked />
+          تحديث تلقائي كل 30ث
+        </label>
+
+        <button class="btn btn--ghost btn--sm" id="btn-refresh">
+          <svg viewBox="0 0 24 24" width="14" height="14"><path d="M4 12a8 8 0 0114-5.3M20 4v4h-4M20 12a8 8 0 01-14 5.3M4 20v-4h4" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>
+          تحديث
+        </button>
+
+        <button class="btn btn--ghost btn--sm" id="btn-export-csv">
+          تصدير CSV
+        </button>
+        <button class="btn btn--ghost btn--sm" id="btn-export-json">
+          تصدير JSON
+        </button>
+        <button class="btn btn--ghost btn--sm" id="btn-logout">
+          خروج
+        </button>
+      </div>
+    </header>
+
+    <!-- Stats -->
+    <div class="dash-stats">
+      <div class="dash-stat">
+        <div class="dash-stat__label">STUDENTS SUBMITTED</div>
+        <div class="dash-stat__value" id="stat-count">
+          <span class="mono">—</span>
+        </div>
+      </div>
+      <div class="dash-stat">
+        <div class="dash-stat__label">AVG ANSWERED</div>
+        <div class="dash-stat__value" id="stat-avg-answered">
+          <span class="mono">—</span>
+        </div>
+      </div>
+      <div class="dash-stat">
+        <div class="dash-stat__label">AVG DURATION</div>
+        <div class="dash-stat__value" id="stat-avg-duration">
+          <span class="mono">—</span>
+        </div>
+      </div>
+      <div class="dash-stat">
+        <div class="dash-stat__label">LAST SUBMISSION</div>
+        <div class="dash-stat__value" id="stat-last">
+          <span class="mono">—</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Body -->
+    <div class="dash-body">
+      <!-- Students panel -->
+      <aside class="students-panel">
+        <div class="students-head">
+          <div class="students-head__row">
+            <h3>الطلاب</h3>
+            <span class="students-head__count" id="students-count">0</span>
+          </div>
+          <input type="text" class="students-search" id="students-search" placeholder="بحث بالاسم أو الصف..." />
+          <div class="students-head__row">
+            <span class="mono mono--dim" style="font-size:11px">ترتيب حسب</span>
+            <select class="students-sort" id="students-sort">
+              <option value="latest">الأحدث أولاً</option>
+              <option value="oldest">الأقدم أولاً</option>
+              <option value="name">الاسم</option>
+              <option value="score-desc">الأعلى إجابةً</option>
+              <option value="score-asc">الأقل إجابةً</option>
+            </select>
+          </div>
+        </div>
+        <div class="students-list" id="students-list">
+          <div class="students-empty">
+            <div class="students-empty__icon">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+                <circle cx="12" cy="8" r="4"/>
+                <path d="M4 21c0-4 4-6 8-6s8 2 8 6"/>
+              </svg>
+            </div>
+            <p>لم يسلّم أي طالب بعد</p>
+            <p style="font-size: 12px; margin-top: 6px;">ستظهر النتائج تلقائياً هنا</p>
+          </div>
+        </div>
+      </aside>
+
+      <!-- Details panel -->
+      <main class="details-panel">
+        <div class="details-tabs">
+          <button class="details-tab is-active" data-tab="student">
+            <span class="mono">01</span>
+            تفاصيل الطالب
+          </button>
+          <button class="details-tab" data-tab="analytics">
+            <span class="mono">02</span>
+            تحليل الأسئلة
+          </button>
+        </div>
+
+        <div class="details-body">
+          <!-- Student detail view -->
+          <div id="tab-student">
+            <div class="detail-empty" id="detail-empty">
+              <div class="detail-empty__icon">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+                  <path d="M14 3v4a1 1 0 001 1h4"/>
+                  <path d="M17 21H7a2 2 0 01-2-2V5a2 2 0 012-2h7l5 5v11a2 2 0 01-2 2z"/>
+                  <line x1="9" y1="13" x2="15" y2="13"/>
+                  <line x1="9" y1="17" x2="13" y2="17"/>
+                </svg>
+              </div>
+              <h3>اختر طالباً لعرض إجاباته</h3>
+              <p style="color: var(--text-muted); font-size: 14px;">اضغط على اسم أي طالب من القائمة</p>
+            </div>
+            <div id="detail-content"></div>
+          </div>
+
+          <!-- Analytics view -->
+          <div id="tab-analytics" class="hidden">
+            <div id="analytics-content">
+              <div class="detail-empty">
+                <div class="detail-empty__icon">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+                    <line x1="12" y1="20" x2="12" y2="10"/>
+                    <line x1="18" y1="20" x2="18" y2="4"/>
+                    <line x1="6" y1="20" x2="6" y2="16"/>
+                  </svg>
+                </div>
+                <h3>سيظهر تحليل الأسئلة عند وجود إجابات</h3>
+              </div>
+            </div>
+          </div>
+        </div>
+      </main>
+    </div>
+  </div>
+
+  <!-- Toast + Modal -->
+  <div class="toast" id="toast" role="status" aria-live="polite"></div>
+
+  <div class="modal hidden" id="modal-confirm">
+    <div class="modal__backdrop" data-close-modal></div>
+    <div class="modal__panel">
+      <div class="panel-corners">
+        <span class="corner corner--tl"></span>
+        <span class="corner corner--tr"></span>
+        <span class="corner corner--bl"></span>
+        <span class="corner corner--br"></span>
+      </div>
+      <div class="modal__body">
+        <div class="modal__badge mono mono--amber">CONFIRM.ACTION</div>
+        <h3 id="modal-title">تأكيد</h3>
+        <p id="modal-message"></p>
+      </div>
+      <div class="modal__actions">
+        <button class="btn btn--ghost" id="modal-cancel">إلغاء</button>
+        <button class="btn btn--primary" id="modal-confirm-btn">تأكيد</button>
+      </div>
+    </div>
+  </div>
+
+  <script src="questions.js"></script>
+  <script src="teacher.js"></script>
+</body>
+</html>
